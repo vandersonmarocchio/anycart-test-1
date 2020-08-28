@@ -2,12 +2,11 @@
   "name": "anycart-test",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "clean": "rm -rf node_modules/ public/ *.log *-lock.json",
+    "reset": "npm run clean && npm i",
+    "dev": "ng serve -c=development -o --port=4200",
+    "prod": "ng serve -c=production -o --port=4200",
+    "build": "ng build -c=production"
   },
   "private": true,
   "dependencies": {
