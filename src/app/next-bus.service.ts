@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
 @Injectable()
@@ -21,7 +21,7 @@ export class NextBusService {
     }
 
     routeList(agencyTag: string): Promise<any> {
-        return this.http.get(`${this.url}routeList&a${agencyTag}`, this.options).toPromise();
+        return this.http.get(`${this.url}routeList&a=${agencyTag}`, this.options).toPromise();
     }
 
     routeConfig(agencyTag: string, routeTag: string): Promise<any> {

@@ -1,7 +1,18 @@
-.overlay {
-    fill: none;
-    pointer-events: all;
+.card {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
-button {
-    padding: 10px 20px;
+.map {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    button {
+        margin-bottom: 20px;
+    }
+    svg {
+        border-width: 1px;
+        border-color: #999999;
+        border-style: solid;
+    }
 }
