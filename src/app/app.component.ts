@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as d3 from 'd3'
-import { environment } from 'src/environments/environment';
+import * as d3 from 'd3';
 import { JsonService } from './json.service';
 import { NextBusService } from './next-bus.service';
 import { XmlUtils } from './xml.utils';
@@ -10,18 +9,6 @@ import { XmlUtils } from './xml.utils';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    public env = environment.url
-    private data = [
-        { "Framework": "Vue", "Stars": "166443", "Released": "2014" },
-        { "Framework": "React", "Stars": "150793", "Released": "2013" },
-        { "Framework": "Angular", "Stars": "62342", "Released": "2016" },
-        { "Framework": "Backbone", "Stars": "27647", "Released": "2010" },
-        { "Framework": "Ember", "Stars": "21471", "Released": "2011" },
-    ];
-    private svg;
-    private margin = 80;
-    private width = 750 - (this.margin * 2);
-    private height = 400 - (this.margin * 2);
 
     constructor(
         public jsonService: JsonService,
@@ -29,54 +16,66 @@ export class AppComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.nextBus.agencyList().then(resp => {
-            console.log(XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml")))
-        })
-        this.svg = d3.select("div#bar")
-            .append("svg")
-            .attr("width", this.width + (this.margin * 2))
-            .attr("height", this.height + (this.margin * 2))
-            .append("g")
-            .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
-        // Create the X-axis band scale
-        const x = d3.scaleBand()
-            .range([0, this.width])
-            .domain(this.data.map(d => d.Framework))
-            .padding(0.2);
-
-        // Draw the X-axis on the DOM
-        this.svg.append("g")
-            .attr("transform", "translate(0," + this.height + ")")
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
-
-        // Create the Y-axis band scale
-        const y = d3.scaleLinear()
-            .domain([0, 200000])
-            .range([this.height, 0]);
-
-        // Draw the Y-axis on the DOM
-        this.svg.append("g")
-            .call(d3.axisLeft(y));
-
-        // Create and fill the bars
-        this.svg.selectAll("bars")
-            .data(this.data)
-            .enter()
-            .append("rect")
-            .attr("x", d => x(d.Framework))
-            .attr("y", d => y(d.Stars))
-            .attr("width", x.bandwidth())
-            .attr("height", (d) => this.height - y(d.Stars))
-            .attr("fill", "#d04a35");
+        this.draeStreets(720, 720)
     }
 
     fetch() {
+        this.nextBus.agencyList().then(resp => { console.log(XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))) })
         this.jsonService.getJson('assets/data/arteries.json').then(resp => console.log(resp))
         this.jsonService.getJson('assets/data/freeways.json').then(resp => console.log(resp))
         this.jsonService.getJson('assets/data/neighborhoods.json').then(resp => console.log(resp))
-        this.jsonService.getJson('assets/data/streets.json').then(resp => console.log(resp))
+    }
+
+    draeStreets(width: number, height: number) {
+        const zoom = d3.zoom()
+            .scaleExtent([1, 40])
+            .on("zoom", zoomed);
+
+        const svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .on("click", reset);
+
+        const g = svg.append("g");
+
+        this.jsonService.getJson('assets/data/streets.json').then(response => {
+            const streetList = response
+            const projection = d3.geoMercator().fitExtent([[0, 0], [width, height]], streetList)
+            const pathGenerator = d3.geoPath().projection(projection)
+            g.append('path')
+                .datum(streetList)
+                .attr('d', pathGenerator)
+                .attr('fill', 'none')
+                .attr('stroke', '#999999')
+                .attr('stroke-width', '0.5')
+                .on("click", e => clicked);
+        })
+
+        svg.call(zoom);
+
+        function reset() {
+            console.log('oi')
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity,
+                d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
+            );
+        }
+
+        d3.select("#reset").on("click", reset)
+
+        function clicked(event, [x, y]) {
+            event.stopPropagation();
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity.translate(width / 2, height / 2).scale(40).translate(-x, -y),
+            );
+        }
+
+        function zoomed({ transform }) {
+            g.attr("transform", transform);
+        }
     }
 }
