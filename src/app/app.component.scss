@@ -1,3 +1,8 @@
+.content-wrapper{
+    display: flex;
+    flex-direction: row;
+}
+
 .card {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -7,6 +12,8 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    margin-bottom: 20px;
+    margin-top: 20px;
     button {
         margin-bottom: 20px;
     }

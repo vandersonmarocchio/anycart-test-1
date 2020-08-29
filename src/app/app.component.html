@@ -1,37 +1,69 @@
-<div nz-row>
+<div class="content-wrapper">
     <div nz-col
-         nzSpan="12"
-         nzOffset="6">
-        <nz-card class="card"
-                 nzTitle="Inputs">
-            <div nz-row>
-                <div nz-col
-                     nzSpan="12">
-                    <nz-form-item>
-                        <nz-form-label>Route</nz-form-label>
-                        <nz-form-control>
-                            <nz-select nzPlaceHolder="Please select"
-                                       (ngModelChange)="onChangeRoute($event)"
-                                       [(ngModel)]="routeSelected">
-                                <nz-option *ngFor="let route of routeList"
-                                           [nzLabel]="route.view"
-                                           [nzValue]="route.value"></nz-option>
-                            </nz-select>
-                        </nz-form-control>
-                    </nz-form-item>
-                </div>
+         nzSpan="12">
+        <div nz-row>
+            <div nz-col
+                 nzSpan="12"
+                 nzOffset="6">
+                <nz-card class="card"
+                         nzTitle="Route List">
+                    <div nz-row>
+                        <div nz-col
+                             nzSpan="24">
+                            <nz-form-item>
+                                <nz-form-label [nzSpan]='24'>Route</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select nzPlaceHolder="Please select"
+                                               (ngModelChange)="onChangeRoute($event)"
+                                               [(ngModel)]="routeSelected">
+                                        <nz-option *ngFor="let route of routeList"
+                                                   [nzLabel]="route.view"
+                                                   [nzValue]="route.value"></nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                </nz-card>
             </div>
-        </nz-card>
+        </div>
+        <div nz-row>
+            <div nz-col
+                 nzSpan="12"
+                 nzOffset="6">
+                <nz-card class="card"
+                         nzTitle="Route Setting">
+                    <div nz-row>
+                        <div nz-col
+                             nzSpan="24">
+                            <nz-form-item>
+                                <nz-form-label [nzSpan]='24'>Direction</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select nzPlaceHolder="Please select"
+                                               (ngModelChange)="onChangeDirection($event)"
+                                               [(ngModel)]="routeSelected">
+                                        <nz-option *ngFor="let direction of directionList"
+                                                   [nzLabel]="direction.view"
+                                                   [nzValue]="direction.value"></nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                </nz-card>
+            </div>
+        </div>
     </div>
-</div>
-<div id="map"
-     class="map">
-    <nz-spin nzSimple
-             [nzSize]="'large'"
-             *ngIf="isLoading"></nz-spin>
-    <button id="reset"
-            nz-button
-            nzType="primary">
-        Reset Zoom
-    </button>
+    <div id="map"
+         class="map">
+        <nz-spin nzSimple
+                 [nzSize]="'large'"
+                 *ngIf="isLoading"></nz-spin>
+        <button id="reset"
+                nz-button
+                [hidden]="isLoading"
+                nzType="primary">
+            Reset Zoom
+        </button>
+    </div>
 </div>

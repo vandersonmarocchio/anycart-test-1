@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import * as d3 from 'd3';
-import { JsonService } from './json.service';
-import { NextBusService } from './next-bus.service';
-import { XmlUtils } from './xml.utils';
+import { Component, OnInit } from '@angular/core'
+import * as d3 from 'd3'
+import { JsonService } from './json.service'
+import { NextBusService } from './next-bus.service'
+import { XmlUtils } from './xml.utils'
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -10,11 +10,15 @@ import { XmlUtils } from './xml.utils';
 })
 export class AppComponent implements OnInit {
     public isLoading: boolean = false
-    public agencyTag = 'sf-muni'
+    public agencyTag: string = 'sf-muni'
     public streetList: any
-    public projectionMap
+
+    public routeLoaded: any
     public routeList: any[] = []
-    public routeSelected: any
+    public routeSelected: string
+    public directionList: any[] = []
+    public directionSelected: string
+
     constructor(
         public jsonService: JsonService,
         public nextBusService: NextBusService
@@ -39,12 +43,17 @@ export class AppComponent implements OnInit {
         this.drawStreets(720, 720)
     }
 
-    drawStreets(width: number, height: number) {
+    onChangeDirection(value) {
+        this.directionSelected = value
+        console.log(this.directionSelected)
+    }
+
+    async drawStreets(width: number, height: number) {
         this.isLoading = true
 
         const zoom = d3.zoom()
             .scaleExtent([1, 40])
-            .on("zoom", zoomed);
+            .on("zoom", zoomed)
 
         d3.select("body")
             .selectAll("svg")
@@ -55,57 +64,64 @@ export class AppComponent implements OnInit {
             .append("svg")
             .attr("width", width)
             .attr("height", height)
-            .on("click", reset);
+            .on("click", reset)
 
-        const g = svg.append("g");
+        const g = svg.append("g")
 
-        this.jsonService.getJson('assets/data/streets.json').then(response => {
-            this.streetList = response
-            this.projectionMap = d3.geoMercator().fitExtent([[0, 0], [width, height]], this.streetList)
+        if (!this.streetList) {
+            await this.jsonService.getJson('assets/data/streets.json').then(response => this.streetList = response)
+        }
 
-            const pathGenerator = d3.geoPath().projection(this.projectionMap)
+        const projectionMap = d3.geoMercator().fitExtent([[0, 0], [width, height]], this.streetList)
+        const pathGenerator = d3.geoPath().projection(projectionMap)
 
-            g.append('path')
-                .datum(this.streetList)
-                .attr('d', pathGenerator)
-                .attr('fill', 'none')
-                .attr('stroke', '#999999')
-                .attr('stroke-width', '0.5')
-                .on("click", e => clicked)
+        g.append('path')
+            .datum(this.streetList)
+            .attr('d', pathGenerator)
+            .attr('fill', 'none')
+            .attr('stroke', '#999999')
+            .attr('stroke-width', '0.5')
+            .on("click", e => clicked)
 
-            if (this.routeSelected) {
-                this.nextBusService.routeConfig(this.agencyTag, this.routeSelected).then(resp => {
-                    const data: any = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
-                    console.log(data)
-                    const color = data.body.route.color
+        if (this.routeSelected) {
+            this.nextBusService.routeConfig(this.agencyTag, this.routeSelected).then(resp => {
 
-                    for (let index = 0; index < data.body.route.path.length; index++) {
-                        const path = data.body.route.path[index]
-                        let coordinatesPath = []
-                        path.point.forEach(point => {
-                            coordinatesPath = [...coordinatesPath, [point.lon, point.lat]]
-                        });
-                        g.selectAll('path' + index)
-                            .data(coordinatesPath)
-                            .enter()
-                            .append("circle")
-                            .attr("cx", (d) => { return this.projectionMap(d)[0]; })
-                            .attr("cy", (d) => { return this.projectionMap(d)[1]; })
-                            .attr("r", "1px")
-                            .attr("fill", "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + ")"
-                            )
+                this.routeLoaded = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
+
+                this.directionList = this.routeLoaded.body.route.direction.map(element => {
+                    return {
+                        value: element.tag,
+                        view: element.title
                     }
-
-                    this.isLoading = false
                 })
-            }
-            this.isLoading = false
-        })
 
-        svg.call(zoom);
+                for (let index = 0; index < this.routeLoaded .body.route.path.length; index++) {
+                    const path = this.routeLoaded .body.route.path[index]
+                    let coordinatesPath = []
+
+                    path.point.forEach(point => {
+                        coordinatesPath = [...coordinatesPath, [point.lon, point.lat]]
+                    })
+
+                    g.selectAll('path' + index)
+                        .data(coordinatesPath)
+                        .enter()
+                        .append("circle")
+                        .attr("cx", (d) => { return projectionMap(d)[0] })
+                        .attr("cy", (d) => { return projectionMap(d)[1] })
+                        .attr("r", "1px")
+                        .attr("fill", "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + ")"
+                        )
+                }
+
+                this.isLoading = false
+            })
+        }
+        this.isLoading = false
+
+        svg.call(zoom)
 
         function reset() {
-            console.log('oi')
             svg.transition().duration(750).call(
                 zoom.transform,
                 d3.zoomIdentity,
@@ -116,7 +132,7 @@ export class AppComponent implements OnInit {
         d3.select("#reset").on("click", reset)
 
         function clicked(event, [x, y]) {
-            event.stopPropagation();
+            event.stopPropagation()
             svg.transition().duration(750).call(
                 zoom.transform,
                 d3.zoomIdentity.translate(width / 2, height / 2).scale(40).translate(-x, -y),
