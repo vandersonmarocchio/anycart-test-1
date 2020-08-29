@@ -9,24 +9,37 @@ import { XmlUtils } from './xml.utils';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
+    public agencyTag = 'sf-muni'
     constructor(
         public jsonService: JsonService,
-        public nextBus: NextBusService
+        public nextBusService: NextBusService
     ) { }
 
     ngOnInit() {
-        this.draeStreets(720, 720)
+        this.drawStreets(720, 720)
+        this.drawRoute()
     }
 
     fetch() {
-        this.nextBus.agencyList().then(resp => { console.log(XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))) })
+        this.nextBusService.agencyList().then(resp => { console.log(XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))) })
         this.jsonService.getJson('assets/data/arteries.json').then(resp => console.log(resp))
         this.jsonService.getJson('assets/data/freeways.json').then(resp => console.log(resp))
         this.jsonService.getJson('assets/data/neighborhoods.json').then(resp => console.log(resp))
     }
 
-    draeStreets(width: number, height: number) {
+    drawRoute() {
+        this.nextBusService.routeConfig(this.agencyTag, '1').then(resp => {
+            const data: any = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
+            data.body.route.path.forEach(element => {
+                element.point.forEach(point => {
+                    console.log(point.lon)
+                    console.log(point.lat)
+                });
+            })
+        })
+    }
+
+    drawStreets(width: number, height: number) {
         const zoom = d3.zoom()
             .scaleExtent([1, 40])
             .on("zoom", zoomed);
@@ -56,7 +69,6 @@ export class AppComponent implements OnInit {
         svg.call(zoom);
 
         function reset() {
-            console.log('oi')
             svg.transition().duration(750).call(
                 zoom.transform,
                 d3.zoomIdentity,
