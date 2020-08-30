@@ -8,26 +8,24 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgZorroAntdModule, NZ_I18N, pt_BR } from 'ng-zorro-antd';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { JsonService } from './json.service';
-import { NextBusService } from './next-bus.service';
+import { SharedModule } from './shared/shared.module';
+import { FullLayoutComponent } from './layouts/full-layout/full-layout.component';
 
 registerLocaleData(pt);
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        FullLayoutComponent
     ],
     imports: [
         BrowserAnimationsModule,
         AppRoutingModule,
-        HttpClientModule,
-        NgZorroAntdModule,
         BrowserModule,
+        SharedModule,
         FormsModule,
     ],
     providers: [
         { provide: NZ_I18N, useValue: pt_BR },
-        NextBusService,
-        JsonService,
     ],
     bootstrap: [AppComponent]
 })

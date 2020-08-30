@@ -1,0 +1,75 @@
+<div class="content-wrapper">
+    <div nz-col
+         nzSpan="12">
+        <div nz-row>
+            <div nz-col
+                 nzSpan="12"
+                 nzOffset="6">
+                <nz-card class="card"
+                         nzTitle="Route Setting">
+                    <div nz-row>
+                        <div nz-col
+                             nzSpan="24">
+                            <nz-form-item>
+                                <nz-form-label [nzSpan]='24'>Map Type</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select nzPlaceHolder="Please select map type"
+                                               (ngModelChange)="onChangeType($event)"
+                                               [(ngModel)]="typeSelected">
+                                        <nz-option *ngFor="let type of typeList"
+                                                   [nzLabel]="type.view"
+                                                   [nzValue]="type.value"></nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                    <div nz-row>
+                        <div nz-col
+                             nzSpan="24">
+                            <nz-form-item>
+                                <nz-form-label [nzSpan]='24'>Route</nz-form-label>
+                                <nz-form-control>
+                                    <nz-select nzPlaceHolder="Please select"
+                                               nzMode="tags"
+                                               (ngModelChange)="onChangeRoute($event)"
+                                               [(ngModel)]="routeListSelected">
+                                        <nz-option *ngFor="let route of routeList"
+                                                   [nzLabel]="route.view"
+                                                   [nzValue]="route.value"></nz-option>
+                                    </nz-select>
+                                </nz-form-control>
+                            </nz-form-item>
+                            <a class="clear-link"
+                               target="_self"
+                               (click)="clear()">Click to clear selection of routes</a>
+                        </div>
+                    </div>
+                </nz-card>
+            </div>
+        </div>
+    </div>
+    <div id="map"
+         class="map">
+        <div class="map-button">
+            <button id="reset"
+                    class="btn-zoom"
+                    nz-button
+                    nzType="default">
+                RESET ZOOM
+            </button>
+            <button id="zoom_in"
+                    class="btn-zoom"
+                    nz-button
+                    nzType="default">
+                + ZOOM IN
+            </button>
+            <button id="zoom_out"
+                    class="btn-zoom"
+                    nz-button
+                    nzType="default">
+                - ZOOM OUT
+            </button>
+        </div>
+    </div>
+</div>

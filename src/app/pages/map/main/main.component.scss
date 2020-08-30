@@ -2,18 +2,12 @@
     display: flex;
     flex-direction: row;
 }
-.map-setting {
-    display: flex;
-    flex-direction: row;
-    nz-select {
-        margin-right: 20px;
-        width: 100%;
-    }
-}
-
 .card {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+.btn-zoom {
+    margin-top: 20px;
 }
 .map {
     display: flex;
@@ -22,12 +16,22 @@
     flex-direction: column;
     margin-bottom: 20px;
     margin-top: 20px;
-    button {
-        margin-bottom: 20px;
-    }
     svg {
         border-width: 1px;
         border-color: #999999;
         border-style: solid;
+    }
+}
+.map-button {
+    margin-bottom: 20px;
+    button {
+        margin-right: 20px;
+    }
+}
+.clear-link {
+    color: #606060;
+    margin-top: 8px;
+    &:hover {
+        text-decoration: underline;
     }
 }

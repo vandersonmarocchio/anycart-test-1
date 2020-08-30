@@ -6,6 +6,7 @@
     "module": "esnext",
     "outDir": "./dist/out-tsc",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
 "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
