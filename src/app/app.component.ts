@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import { JsonService } from './json.service'
 import { NextBusService } from './next-bus.service'
 import { XmlUtils } from './xml.utils'
+import { GeoJsonUtils } from './geojson.utils'
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -10,14 +11,34 @@ import { XmlUtils } from './xml.utils'
 })
 export class AppComponent implements OnInit {
     public isLoading: boolean = false
-    public agencyTag: string = 'sf-muni'
     public streetList: any
 
     public routeLoaded: any
     public routeList: any[] = []
     public routeSelected: string
-    public directionList: any[] = []
-    public directionSelected: string
+    public typeList: any[] = [
+        {
+            view: 'Streets',
+            value: 'streets'
+        },
+        {
+            view: 'Freeways',
+            value: 'freeways'
+        },
+        {
+            view: 'Arteries',
+            value: 'arteries'
+        },
+        {
+            view: 'Neighborhoods',
+            value: 'neighborhoods'
+        }
+    ]
+    public typeSelected: string = 'streets'
+
+    public vehicleList: any[] = []
+
+    public interval
 
     constructor(
         public jsonService: JsonService,
@@ -25,7 +46,7 @@ export class AppComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.nextBusService.routeList(this.agencyTag).then(resp => {
+        this.nextBusService.routeList().then(resp => {
             const data: any = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
             data.body.route.forEach(route => {
                 const option = {
@@ -38,14 +59,15 @@ export class AppComponent implements OnInit {
         this.drawStreets(720, 720)
     }
 
-    onChangeRoute(value) {
-        this.routeSelected = value
+    onChangeType(value) {
+        this.typeSelected = value
+        this.streetList = null
         this.drawStreets(720, 720)
     }
 
-    onChangeDirection(value) {
-        this.directionSelected = value
-        console.log(this.directionSelected)
+    onChangeRoute(value) {
+        this.routeSelected = value
+        this.drawStreets(720, 720)
     }
 
     async drawStreets(width: number, height: number) {
@@ -66,16 +88,16 @@ export class AppComponent implements OnInit {
             .attr("height", height)
             .on("click", reset)
 
-        const g = svg.append("g")
+        const map = svg.append("g")
 
         if (!this.streetList) {
-            await this.jsonService.getJson('assets/data/streets.json').then(response => this.streetList = response)
+            await this.jsonService.getJson(`assets/data/${this.typeSelected}.json`).then(response => this.streetList = response)
         }
 
         const projectionMap = d3.geoMercator().fitExtent([[0, 0], [width, height]], this.streetList)
         const pathGenerator = d3.geoPath().projection(projectionMap)
 
-        g.append('path')
+        map.append('path')
             .datum(this.streetList)
             .attr('d', pathGenerator)
             .attr('fill', 'none')
@@ -84,36 +106,45 @@ export class AppComponent implements OnInit {
             .on("click", e => clicked)
 
         if (this.routeSelected) {
-            this.nextBusService.routeConfig(this.agencyTag, this.routeSelected).then(resp => {
-
+            this.nextBusService.routeConfig(this.routeSelected).then(resp => {
                 this.routeLoaded = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
+                for (let index = 0; index < this.routeLoaded.body.route.path.length; index++) {
 
-                this.directionList = this.routeLoaded.body.route.direction.map(element => {
-                    return {
-                        value: element.tag,
-                        view: element.title
-                    }
-                })
+                    const path = this.routeLoaded.body.route.path[index]
+                    const routeData: any = GeoJsonUtils.transformGeoJSON(path)
 
-                for (let index = 0; index < this.routeLoaded .body.route.path.length; index++) {
-                    const path = this.routeLoaded .body.route.path[index]
-                    let coordinatesPath = []
+                    map.append('path')
+                        .datum(routeData)
+                        .attr('d', pathGenerator)
+                        .attr('fill', 'none')
+                        .attr('stroke', "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + ")")
+                        .attr('stroke-width', '0.5')
+                        .on("click", e => clicked)
 
-                    path.point.forEach(point => {
-                        coordinatesPath = [...coordinatesPath, [point.lon, point.lat]]
-                    })
-
-                    g.selectAll('path' + index)
-                        .data(coordinatesPath)
-                        .enter()
-                        .append("circle")
-                        .attr("cx", (d) => { return projectionMap(d)[0] })
-                        .attr("cy", (d) => { return projectionMap(d)[1] })
-                        .attr("r", "1px")
-                        .attr("fill", "rgb(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + ")"
-                        )
                 }
 
+                this.nextBusService.vehicleLocations(this.routeSelected, new Date().getTime().toString()).then(response => {
+                    const responseData: any = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(response, "text/xml"))
+                    if (responseData.body.vehicle) {
+                        this.vehicleList = responseData.body.vehicle
+                        let coordinatesVehicleList = []
+                        this.vehicleList.forEach(point => {
+                            coordinatesVehicleList = [...coordinatesVehicleList, [point.lon, point.lat]]
+                        })
+
+                        console.log(coordinatesVehicleList)
+
+                        map.selectAll('path')
+                            .data(coordinatesVehicleList)
+                            .enter()
+                            .append("circle")
+                            .attr("cx", (d) => { return projectionMap(d)[0] })
+                            .attr("cy", (d) => { return projectionMap(d)[1] })
+                            .attr("r", "2px")
+                            .attr("fill", '#000')
+                            .on("click", e => clicked)
+                    }
+                })
                 this.isLoading = false
             })
         }
@@ -140,14 +171,7 @@ export class AppComponent implements OnInit {
         }
 
         function zoomed({ transform }) {
-            g.attr("transform", transform)
+            map.attr("transform", transform)
         }
-    }
-
-    fetch() {
-        this.nextBusService.agencyList().then(resp => { console.log(XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))) })
-        this.jsonService.getJson('assets/data/arteries.json').then(resp => console.log(resp))
-        this.jsonService.getJson('assets/data/freeways.json').then(resp => console.log(resp))
-        this.jsonService.getJson('assets/data/neighborhoods.json').then(resp => console.log(resp))
     }
 }

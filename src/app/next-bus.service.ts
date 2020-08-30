@@ -12,19 +12,19 @@ export class NextBusService {
         }
     }
 
-    vehicleLocation(agencyTag: string, vehicleId: string): Promise<any> {
-        return this.http.get(`${this.url}vehicleLocation&a=${agencyTag}&v=${vehicleId}`, this.options).toPromise();
+    routeList(): Promise<any> {
+        return this.http.get(`${this.url}routeList&a=sf-muni`, this.options).toPromise();
     }
 
-    agencyList(): Promise<any> {
-        return this.http.get(`${this.url}agencyList`, this.options).toPromise();
+    routeConfig(routeTag: string): Promise<any> {
+        return this.http.get(`${this.url}routeConfig&a=sf-muni&r=${routeTag}`, this.options).toPromise();
     }
 
-    routeList(agencyTag: string): Promise<any> {
-        return this.http.get(`${this.url}routeList&a=${agencyTag}`, this.options).toPromise();
+    vehicleLocations(routeTag: string, time: string): Promise<any> {
+        return this.http.get(`${this.url}vehicleLocations&a=sf-muni&r=${routeTag}&t=${time}`, this.options).toPromise();
     }
 
-    routeConfig(agencyTag: string, routeTag: string): Promise<any> {
-        return this.http.get(`${this.url}routeConfig&a=${agencyTag}&r=${routeTag}`, this.options).toPromise();
+    vehicleLocation(vehicleId: string): Promise<any> {
+        return this.http.get(`${this.url}vehicleLocation&a=sf-muni&v=${vehicleId}`, this.options).toPromise();
     }
 }

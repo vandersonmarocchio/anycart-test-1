@@ -6,7 +6,7 @@
                  nzSpan="12"
                  nzOffset="6">
                 <nz-card class="card"
-                         nzTitle="Route List">
+                         nzTitle="Route Setting">
                     <div nz-row>
                         <div nz-col
                              nzSpan="24">
@@ -27,43 +27,40 @@
                 </nz-card>
             </div>
         </div>
-        <div nz-row>
-            <div nz-col
-                 nzSpan="12"
-                 nzOffset="6">
-                <nz-card class="card"
-                         nzTitle="Route Setting">
-                    <div nz-row>
-                        <div nz-col
-                             nzSpan="24">
-                            <nz-form-item>
-                                <nz-form-label [nzSpan]='24'>Direction</nz-form-label>
-                                <nz-form-control>
-                                    <nz-select nzPlaceHolder="Please select"
-                                               (ngModelChange)="onChangeDirection($event)"
-                                               [(ngModel)]="routeSelected">
-                                        <nz-option *ngFor="let direction of directionList"
-                                                   [nzLabel]="direction.view"
-                                                   [nzValue]="direction.value"></nz-option>
-                                    </nz-select>
-                                </nz-form-control>
-                            </nz-form-item>
-                        </div>
-                    </div>
-                </nz-card>
-            </div>
-        </div>
     </div>
     <div id="map"
          class="map">
         <nz-spin nzSimple
                  [nzSize]="'large'"
                  *ngIf="isLoading"></nz-spin>
-        <button id="reset"
-                nz-button
-                [hidden]="isLoading"
-                nzType="primary">
-            Reset Zoom
-        </button>
+        <div class="map-setting">
+            <div nz-col
+                 nzSpan="12"
+                 nzOffset="6">
+                <div nz-row>
+                    <div nz-col
+                         nzSpan="24">
+                        <nz-form-item>
+                            <nz-form-label [nzSpan]='12'>Direction</nz-form-label>
+                            <nz-form-control class="map-setting">
+                                <nz-select nzPlaceHolder="Please select map type"
+                                           (ngModelChange)="onChangeType($event)"
+                                           [(ngModel)]="typeSelected">
+                                    <nz-option *ngFor="let type of typeList"
+                                               [nzLabel]="type.view"
+                                               [nzValue]="type.value"></nz-option>
+                                </nz-select>
+                                <button id="reset"
+                                        nz-button
+                                        [hidden]="isLoading"
+                                        nzType="primary">
+                                    Reset Zoom
+                                </button>
+                            </nz-form-control>
+                        </nz-form-item>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
