@@ -1,6 +1,6 @@
 
 export namespace GeoJsonUtils {
-    export function transformToGeoJSON(path) {
+    export function transformPathToGeoJSON(path) {
         let geoJsonModel = {
             type: 'FeatureCollection',
             features: []
