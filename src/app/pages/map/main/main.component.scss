@@ -6,7 +6,7 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
-.btn-zoom {
+.btn {
     margin-top: 20px;
 }
 .map {
@@ -14,8 +14,6 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    margin-bottom: 20px;
-    margin-top: 20px;
     svg {
         border-width: 1px;
         border-color: #999999;
@@ -28,15 +26,7 @@
         margin-right: 20px;
     }
 }
-.clear-link {
-    color: #606060;
-    margin-top: 8px;
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-.m-t-b-20 {
-    margin-top: 20px;
-    margin-bottom: 20px;
+.m-t-b-10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

@@ -2,26 +2,29 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import * as d3 from 'd3'
 import * as moment from 'moment'
+import 'moment-timezone'
 import { RouteConfigInterface } from 'src/app/shared/interface/route-config.type'
 import { JsonService } from 'src/app/shared/services/json.service'
 import { NextBusService } from 'src/app/shared/services/next-bus.service'
 import { GeoJsonUtils } from 'src/app/shared/utils/geojson.utils'
 import { LocalStorageUtils } from 'src/app/shared/utils/local-storage.utils'
 import { XmlUtils } from 'src/app/shared/utils/xml.utils'
+import { BrowserDetect } from 'src/app/shared/utils/browser-detect.utils'
 
 @Component({
     templateUrl: './main.component.html',
     styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-    public width: number = 720
-    public height: number = 720
+    public width: number = 0
+    public height: number = 0
     public svg: any
     public map: any
     public projectionMap: any
     public geoPath: any
     public sourceMap: any
-    public lastUpdatedTime: string
+    public lastUpdatedTimeSanFrancisco: string
+    public lastUpdatedTimeLocal: string
 
     public routeLoaded: RouteConfigInterface[] = []
     public routeList: any[] = []
@@ -56,6 +59,9 @@ export class MainComponent implements OnInit {
         public actr: ActivatedRoute,
     ) {
         this.routeList = actr.snapshot.data.data
+        const isMobile = BrowserDetect.detectMobile()
+        this.width = isMobile ? 720 : screen.width / 2.5
+        this.height = isMobile ? 720 : screen.width / 2.5
     }
 
     ngOnInit() {
@@ -197,7 +203,8 @@ export class MainComponent implements OnInit {
 
         for (const route of this.routeLoaded) {
             const time = moment().subtract('30', 'seconds')
-            this.lastUpdatedTime = time.format('DD/MM/YYYY HH:mm:ss')
+            this.lastUpdatedTimeLocal = time.format('DD/MM/YYYY HH:mm:ss')
+            this.lastUpdatedTimeSanFrancisco = time.tz('America/Los_Angeles').format('DD/MM/YYYY HH:mm:ss')
             await this.nextBusService.vehicleLocations(route.tag, time.toDate().getTime().toString()).then(async response => {
                 if (response.vehicle != undefined && response.vehicle.length > 0) {
                     for (const point of response.vehicle) {
@@ -247,10 +254,5 @@ export class MainComponent implements OnInit {
                 d3.zoomIdentity.translate(this.width / 2, this.height / 2).scale(40).translate(-x, -y),
             )
         }
-    }
-
-    clear() {
-        this.routeListSelected = []
-        this.drawMap()
     }
 }

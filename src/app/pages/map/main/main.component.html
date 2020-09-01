@@ -42,6 +42,7 @@
                                 <nz-form-control>
                                     <nz-select nzPlaceHolder="Please select"
                                                nzMode="tags"
+                                               nzAllowClear
                                                (ngModelChange)="onChangeRoute($event)"
                                                [(ngModel)]="routeListSelected">
                                         <nz-option *ngFor="let route of routeList"
@@ -50,23 +51,19 @@
                                     </nz-select>
                                 </nz-form-control>
                             </nz-form-item>
-                            <a class="clear-link"
-                               target="_self"
-                               (click)="clear()">Click to clear selection of routes</a>
                         </div>
                     </div>
                     <div nz-row
-                         class="m-t-b-20">
+                         class="m-t-b-10">
                         <div nz-col
                              nzSpan="24">
                             <label nz-checkbox
                                    (ngModelChange)="onChangeShowStops($event)"
-                                   [(ngModel)]="showStops">Show stops (points of the same color as the route will
-                                appear)</label>
+                                   [(ngModel)]="showStops">Show stops</label>
                         </div>
                     </div>
                     <div nz-row
-                         class="m-t-b-20">
+                         class="m-t-b-10">
                         <div nz-col
                              nzSpan="24">
                             <label nz-checkbox
@@ -74,37 +71,47 @@
                                    [(ngModel)]="showRoute">Show route</label>
                         </div>
                     </div>
+                    <div nz-row>
+                        <label *ngIf="lastUpdatedTimeSanFrancisco && lastUpdatedTimeLocal">
+                            Last updated time <br>
+                            {{lastUpdatedTimeSanFrancisco}} (GMT-7) <br>
+                            {{lastUpdatedTimeLocal}} (GMT-3)
+                        </label>
+                    </div>
                 </nz-card>
             </div>
         </div>
     </div>
     <div id="map"
-         class="map">
-        <label *ngIf="lastUpdatedTime">
-            Last updated time: {{lastUpdatedTime}}
-        </label>
+         nz-col
+         class="map"
+         nzXs="24"
+         nzSm="24"
+         nzMd="24"
+         nzLg="12"
+         nzXl="12">
         <div class="map-button">
-            <button id="reset"
-                    class="btn-zoom"
+            <button id="refresh"
+                    class="btn"
                     nz-button
                     (click)="drawMap()"
                     nzType="default">
                 REFRESH
             </button>
             <button id="reset"
-                    class="btn-zoom"
+                    class="btn"
                     nz-button
                     nzType="default">
                 RESET ZOOM
             </button>
             <button id="zoom_in"
-                    class="btn-zoom"
+                    class="btn"
                     nz-button
                     nzType="default">
                 + ZOOM IN
             </button>
             <button id="zoom_out"
-                    class="btn-zoom"
+                    class="btn"
                     nz-button
                     nzType="default">
                 - ZOOM OUT
