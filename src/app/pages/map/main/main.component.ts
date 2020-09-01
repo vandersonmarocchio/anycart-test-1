@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import * as d3 from 'd3'
+import * as moment from 'moment'
 import { RouteConfigInterface } from 'src/app/shared/interface/route-config.type'
 import { JsonService } from 'src/app/shared/services/json.service'
 import { NextBusService } from 'src/app/shared/services/next-bus.service'
-import { XmlUtils } from 'src/app/shared/utils/xml.utils'
 import { GeoJsonUtils } from 'src/app/shared/utils/geojson.utils'
-import { ActivatedRoute } from '@angular/router'
 import { LocalStorageUtils } from 'src/app/shared/utils/local-storage.utils'
-import * as moment from 'moment'
+import { XmlUtils } from 'src/app/shared/utils/xml.utils'
 
 @Component({
     templateUrl: './main.component.html',
@@ -118,39 +118,37 @@ export class MainComponent implements OnInit {
 
         this.routeLoaded = []
         if (this.routeListSelected.length > 0) {
-            const routeConfigOnCache: any[] = LocalStorageUtils.getItem('routeConfigList') || []
             for (let indexRoute = 0; indexRoute < this.routeListSelected.length; indexRoute++) {
-                let routeFound = routeConfigOnCache.find(el => el.tag == this.routeListSelected[indexRoute])
-                if (routeFound === undefined)
-                    routeFound = await this.nextBusService.routeConfig(this.routeListSelected[indexRoute]).then((resp) => XmlUtils.transformToRouteConfigInterface(resp))
-                routeConfigOnCache.push(routeFound)
-                this.routeLoaded.push(routeFound)
+                let route = LocalStorageUtils.getItem(btoa(this.routeListSelected[indexRoute])) || null
+                if (route === null)
+                    route = await this.nextBusService.routeConfig(this.routeListSelected[indexRoute]).then((resp) => XmlUtils.transformToRouteConfigInterface(resp))
+                this.routeLoaded.push(route)
                 if (this.showRoute) {
-                    for (let index = 0; index < routeFound.path.length; index++) {
+                    for (let index = 0; index < route.path.length; index++) {
                         this.map
                             .append('path')
-                            .datum(GeoJsonUtils.transformPathToGeoJSON(routeFound.path[index]))
+                            .datum(GeoJsonUtils.transformPathToGeoJSON(route.path[index]))
                             .attr('d', this.geoPath)
                             .attr('fill', 'none')
-                            .attr('stroke', routeFound.color)
+                            .attr('stroke', route.color)
                             .attr('stroke-width', '1')
                             .on('click', e => clicked)
                     }
                 }
                 if (this.showStops) {
-                    for (let index = 0; index < routeFound.stop.length; index++) {
+                    for (let index = 0; index < route.stop.length; index++) {
                         this.map
                             .append('circle')
-                            .attr('id', 'stop' + routeFound.title.replace(/[^a-zA-Z]+/g, '') + routeFound.stop[index].stopId)
-                            .attr('cx', this.projectionMap([routeFound.stop[index].lon, routeFound.stop[index].lat])[0])
-                            .attr('cy', this.projectionMap([routeFound.stop[index].lon, routeFound.stop[index].lat])[1])
+                            .attr('id', 'stop' + route.title.replace(/[^a-zA-Z]+/g, '') + route.stop[index].stopId)
+                            .attr('cx', this.projectionMap([route.stop[index].lon, route.stop[index].lat])[0])
+                            .attr('cy', this.projectionMap([route.stop[index].lon, route.stop[index].lat])[1])
                             .attr('r', '1.5px')
-                            .attr('fill', routeFound.color)
+                            .attr('fill', route.color)
                             .on('click', e => clicked)
                     }
                 }
+                LocalStorageUtils.setItem(btoa(this.routeListSelected[indexRoute]), route)
             }
-            LocalStorageUtils.setItem('routeConfigList', routeConfigOnCache)
         }
 
         function clicked(event, [x, y]) {

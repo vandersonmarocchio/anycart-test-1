@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core"
 import { Resolve } from "@angular/router"
 import * as Bowser from 'bowser'
-import * as firebase from 'firebase/app'
+import * as firebase from 'firebase'
 import * as moment from 'moment'
 import { NextBusService } from "src/app/shared/services/next-bus.service"
 import { IDUtils } from "src/app/shared/utils/id.utils"

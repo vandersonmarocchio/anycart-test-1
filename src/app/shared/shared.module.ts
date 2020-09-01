@@ -32,7 +32,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button'
     declarations: [],
     providers: [
         NextBusService,
-        JsonService,
+        JsonService
     ]
 })
 
