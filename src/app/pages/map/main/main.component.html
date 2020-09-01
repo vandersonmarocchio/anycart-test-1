@@ -28,7 +28,8 @@
                         <div nz-col
                              nzSpan="24">
                             <nz-form-item>
-                                <nz-form-label [nzSpan]='24'>Route</nz-form-label>
+                                <nz-form-label [nzSpan]='24'>Route (hover over the point to show the bus data)
+                                </nz-form-label>
                                 <nz-form-control>
                                     <nz-select nzPlaceHolder="Please select"
                                                nzMode="tags"
@@ -45,12 +46,34 @@
                                (click)="clear()">Click to clear selection of routes</a>
                         </div>
                     </div>
+                    <div nz-row
+                         class="m-t-b-20">
+                        <div nz-col
+                             nzSpan="24">
+                            <label nz-checkbox
+                                   (ngModelChange)="onChangeShowStops($event)"
+                                   [(ngModel)]="showStops">Show stops (points of the same color as the route will
+                                appear)</label>
+                        </div>
+                    </div>
+                    <div nz-row
+                         class="m-t-b-20">
+                        <div nz-col
+                             nzSpan="24">
+                            <label nz-checkbox
+                                   (ngModelChange)="onChangeShowRoute($event)"
+                                   [(ngModel)]="showRoute">Show route</label>
+                        </div>
+                    </div>
                 </nz-card>
             </div>
         </div>
     </div>
     <div id="map"
          class="map">
+        <label *ngIf="lastUpdatedTime">
+            Last updated time: {{lastUpdatedTime}}
+        </label>
         <div class="map-button">
             <button id="reset"
                     class="btn-zoom"
