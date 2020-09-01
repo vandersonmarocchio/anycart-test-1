@@ -5,10 +5,14 @@ import * as firebase from 'firebase'
 import * as moment from 'moment'
 import { NextBusService } from "src/app/shared/services/next-bus.service"
 import { IDUtils } from "src/app/shared/utils/id.utils"
+import { HttpClient } from "@angular/common/http"
 
 @Injectable()
 export class MainResolver implements Resolve<any> {
-    constructor(public nextBusService: NextBusService) { }
+    constructor(
+        public nextBusService: NextBusService,
+        public httpClient: HttpClient
+    ) { }
     resolve(): Promise<any> {
         this.presence()
         return this.nextBusService.routeList().then(response => {
@@ -26,20 +30,22 @@ export class MainResolver implements Resolve<any> {
         })
     }
 
-    //just to know who saw my project hahahah
+    //just to know who saw the project hahahah
     presence() {
-        const alreadySendPresence = localStorage.getItem('presence')
-        if (!alreadySendPresence) {
-            const userAgent = Bowser.parse(window.navigator.userAgent)
-            firebase
-                .database()
-                .ref(`sessions/${IDUtils.generateID()}`)
-                .set({
-                    time: moment().format('LLL'),
-                    browser: userAgent.browser,
-                    os: userAgent.os
-                })
-            localStorage.setItem('presence', 'true')
+        if (!localStorage.getItem('presence')) {
+            this.httpClient.get('http://ip-api.com/json').toPromise().then(resp => {
+                const userAgent = Bowser.parse(window.navigator.userAgent)
+                firebase
+                    .database()
+                    .ref(`sessions/${IDUtils.generateID()}`)
+                    .set({
+                        time: moment().format('LLL'),
+                        browser: userAgent.browser,
+                        os: userAgent.os,
+                        location: resp || null
+                    })
+                localStorage.setItem('presence', 'true')
+            })
         }
     }
 }

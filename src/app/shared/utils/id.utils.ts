@@ -5,7 +5,7 @@ export namespace IDUtils {
         let result = ''
         let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         let charactersLength = characters.length
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 25; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength))
         }
         return result
