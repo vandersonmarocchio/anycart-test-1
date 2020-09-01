@@ -1,7 +1,7 @@
 import { RouteConfigInterface } from "../interface/route-config.type"
 
 export namespace XmlUtils {
-    export function transformXmlToJson(xml) {
+    export function transformXmlToJson(xml: any) {
         let object = {}
         if (xml.nodeType == 1) {
             if (xml.attributes.length > 0) {
@@ -31,7 +31,7 @@ export namespace XmlUtils {
         return object
     }
 
-    export function transformToRouteConfigInterface(object): RouteConfigInterface {
+    export function transformToRouteConfigInterface(object: any): RouteConfigInterface {
         return {
             color: '#' + object.route.color,
             oppositeColor: '#' + object.route.oppositeColor,

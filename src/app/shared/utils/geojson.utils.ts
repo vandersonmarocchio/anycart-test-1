@@ -1,6 +1,7 @@
+import { PathInterface } from "../interface/route-config.type"
 
 export namespace GeoJsonUtils {
-    export function transformPathToGeoJSON(path) {
+    export function transformPathToGeoJSON(path: PathInterface) {
         let geoJsonModel = {
             type: 'FeatureCollection',
             features: []

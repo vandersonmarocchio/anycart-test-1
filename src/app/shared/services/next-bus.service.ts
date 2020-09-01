@@ -6,13 +6,13 @@ import { XmlUtils } from '../utils/xml.utils'
 export class NextBusService {
     public url: string = 'http://webservices.nextbus.com/service/publicXMLFeed?command='
 
-    constructor(public http: HttpClient) { }
+    constructor(public httpClient: HttpClient) { }
 
     genericGet(path: string): Promise<any> {
-        return this.http
+        return this.httpClient
             .get(path, { responseType: 'text' })
             .toPromise()
-            .then(resp => {
+            .then((resp: any) => {
                 const result: any = XmlUtils.transformXmlToJson(new DOMParser().parseFromString(resp, "text/xml"))
                 return result.body
             })

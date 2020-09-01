@@ -84,7 +84,6 @@ export class MainComponent implements OnInit {
     }
 
     async drawMap() {
-
         // delete old svg and draw new
         d3.selectAll('svg#sf-map')
             .remove()

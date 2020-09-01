@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core'
 
 @Injectable()
 export class JsonService {
-    constructor(public http: HttpClient) { }
-    getJson(path): Promise<any> {
-        return this.http.get(path).toPromise()
+    constructor(public httpClient: HttpClient) { }
+    getJson(path: string): Promise<any> {
+        return this.httpClient.get(path).toPromise()
     }
 }

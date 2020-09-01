@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
-import { FullLayoutComponent } from './layouts/full-layout/full-layout.component';
-import { fullLayoutRoutes } from './shared/routes/full-layout.routes';
+import { NgModule } from '@angular/core'
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router'
+import { FullLayoutComponent } from './layouts/full-layout/full-layout.component'
+import { fullLayoutRoutes } from './shared/routes/full-layout.routes'
 
 const appRoutes: Routes = [
     {
